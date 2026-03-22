@@ -1,0 +1,25 @@
+# Core AI
+openai>=1.14.0
+
+# Vector DB
+faiss-cpu>=1.8.0
+
+# RAG utilities
+langchain>=0.2.0
+langchain-openai>=0.1.0
+langchain-community>=0.2.0
+tiktoken>=0.7.0
+
+# Evaluation
+ragas>=0.1.7
+
+# UI
+streamlit>=1.32.0
+
+# Data & Viz
+pandas>=2.0.0
+plotly>=5.19.0
+
+# Utils
+python-dotenv>=1.0.0
+numpy>=1.26.0
