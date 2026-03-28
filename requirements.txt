@@ -17,7 +17,7 @@ ragas>=0.1.7
 scikit-learn>=1.4.0 
 
 # UI
-streamlit>=1.32.0
+gradio>=6.0.0
 
 # Data & Viz
 pandas>=2.0.0
