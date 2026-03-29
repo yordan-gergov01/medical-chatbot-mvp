@@ -44,30 +44,34 @@ _CONFIRM_RE = re.compile(
 _SYSTEM_PROMPT = """\
 Ти си AI асистент ЕДИНСТВЕНО на Медицински Център "Здраве Плюс", София.
 Днешната дата е {today}.{doctor_note}
-
+ 
 ОБХВАТ — отговаряш САМО на въпроси свързани с:
 - симптоми и насочване към специалист
 - лекари, специалности и цени в центъра
 - свободни часове и записване на час
 - работно време, адрес, контакти на центъра
 - НЗОК покритие
-
+ 
 При всякакви ДРУГИ теми (политика, технологии, история, готвене и т.н.) отговаряй точно:
 "Аз съм асистент на Медицински Център Здраве Плюс и мога да помогна само с медицински въпроси и записване на часове. За друго, моля обърнете се към подходящ източник."
-
+ 
 ПРАВИЛА ЗА ИНСТРУМЕНТИ:
 1. Задължителен ред: search_doctors → check_availability → book_appointment
-2. Никога не извиквай check_availability без doctor_id от search_doctors в СЪЩИЯ разговор
-3. Показвай САМО часове върнати от check_availability като available=true
-4. Преди book_appointment вземи три имена и телефон от пациента
-5. Никога не потвърждавай записване без реален успешен резултат от book_appointment
-6. При нова специалност → задължително извикай search_doctors отново
-
+2. ВИНАГИ извиквай search_doctors първо за да получиш верния doctor_id — никога не предполагай или измисляй doctor_id.
+3. Използвай САМО doctor_id от резултата на search_doctors — полето "id" в обекта на лекаря.
+4. Никога не извиквай check_availability без doctor_id взет от search_doctors в СЪЩИЯ разговор.
+5. Показвай САМО часове върнати от check_availability като available=true.
+6. Преди book_appointment вземи три имена и телефон от пациента.
+7. Никога не потвърждавай записване без реален успешен резултат от book_appointment.
+8. При нова специалност → задължително извикай search_doctors отново.
+ 
+ВАЛУТА: Всички цени са в евро (€). Винаги показвай цените с "евро" или "€" - никога "лева" или "лв".
+ 
 ОБЩИ ПРАВИЛА:
 - Отговаряй само на български, топло и разбиращо
 - Не поставяй диагнози — само насочвай към специалист
 - При спешни симптоми (гръдна болка, загуба на съзнание, инсулт, парализа) → 112
-
+ 
 Адрес: бул. Васил Левски 47, София | Тел: 02 800 12 34
 Работно време: Пон–Пет 08:00–19:00, Събота 09:00–14:00\
 """
@@ -77,6 +81,21 @@ _DOCTOR_NOTE = (
     " Ползвай САМО този doctor_id за check_availability и book_appointment."
     " За друга специалност → search_doctors първо."
 )
+
+
+def _content_as_str(content) -> str:
+    """Normalize OpenAI message content — can be str, list of parts, or None."""
+    if content is None:
+        return ""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return " ".join(
+            part.get("text", "") if isinstance(part, dict) else str(part)
+            for part in content
+        )
+    return str(content)
+
 
 def _active_doctor_from_history(history: list[dict]) -> tuple[str, dict] | tuple[None, None]:
     """
@@ -90,7 +109,7 @@ def _active_doctor_from_history(history: list[dict]) -> tuple[str, dict] | tuple
         if msg.get("role") != "tool":
             continue
         try:
-            if doc_id := json.loads(msg.get("content") or "{}").get("doctor_id"):
+            if doc_id := json.loads(_content_as_str(msg.get("content"))).get("doctor_id"):
                 if doc_id in _doctors:
                     last_id = doc_id
         except (json.JSONDecodeError, TypeError):
@@ -102,7 +121,7 @@ def _active_doctor_from_history(history: list[dict]) -> tuple[str, dict] | tuple
     for msg in reversed(history):
         if msg.get("role") != "assistant":
             continue
-        if m := _SENTINEL_RE.search(msg.get("content") or ""):
+        if m := _SENTINEL_RE.search(_content_as_str(msg.get("content"))):
             if (doc_id := m.group("id")) in _doctors:
                 return doc_id, _doctors[doc_id]
 
@@ -114,7 +133,7 @@ def _doctor_from_turn(tool_msgs: list[dict]) -> str | None:
     last_id: str | None = None
     for msg in tool_msgs:
         try:
-            if doc_id := json.loads(msg.get("content") or "{}").get("doctor_id"):
+            if doc_id := json.loads(_content_as_str(msg.get("content"))).get("doctor_id"):
                 if doc_id in _doctors:
                     last_id = doc_id
         except (json.JSONDecodeError, TypeError):
@@ -125,10 +144,11 @@ def _doctor_from_turn(tool_msgs: list[dict]) -> str | None:
 def _booked_this_turn(tool_msgs: list[dict]) -> bool:
     """True only when a successful book_appointment result exists in this turn."""
     return any(
-        '"success": true' in (m.get("content") or "")
-        and '"reference"' in (m.get("content") or "")
+        '"success": true' in _content_as_str(m.get("content"))
+        and '"reference"' in _content_as_str(m.get("content"))
         for m in tool_msgs
     )
+
 
 class MedicalAgent:
     def __init__(self, index_dir: Path = INDEX_DIR):

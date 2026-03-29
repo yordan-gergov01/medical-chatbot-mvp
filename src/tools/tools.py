@@ -147,7 +147,8 @@ TOOL_SCHEMAS = [
             "name": "search_doctors",
             "description": (
                 "Search for doctors by specialty and/or NHIF acceptance. "
-                "Use this when the patient asks which doctors are available for a specialty."
+                "Returns a list of doctors with their exact doctor_id. "
+                "Always call this first to get the correct doctor_id before check_availability."
             ),
             "parameters": {
                 "type": "object",
