@@ -30,7 +30,6 @@ def respond(user_message: str, history: list):
 
     history = history + [{"role": "user", "content": user_message}]
 
-    # Веднага показва потребителското съобщение + thinking bubble
     thinking = history + [{"role": "assistant", "content": "⏳ Мисля…"}]
     yield "", thinking
 
@@ -65,7 +64,6 @@ def build_ui() -> gr.Blocks:
 
         with gr.Row():
             with gr.Column(scale=3):
-                # chatbot е директен output на respond — без .then()
                 chatbot = gr.Chatbot(
                     height=480,
                     show_label=False,
@@ -90,19 +88,18 @@ def build_ui() -> gr.Blocks:
                     ex_btn.click(fn=lambda e=example: e, outputs=msg_input)
 
                 gr.Markdown("""
-### ℹ️ Информация
-**Работно време**
-Пон – Пет: 08:00 – 19:00
-Събота: 09:00 – 14:00
+                    ### ℹ️ Информация
+                    **Работно време**
+                    Пон – Пет: 08:00 – 19:00
+                    Събота: 09:00 – 14:00
 
-**Спешни случаи**
-При спешни симптоми — обадете се на **112**
+                    **Спешни случаи**
+                    При спешни симптоми — обадете се на **112**
 
-**Записване по телефон**
-02 800 12 34
-                """)
+                    **Записване по телефон**
+                    02 800 12 34
+                    """)
 
-        # chatbot е в outputs директно — всеки yield се рендерира веднага
         submit_btn.click(
             fn=respond,
             inputs=[msg_input, chatbot],
