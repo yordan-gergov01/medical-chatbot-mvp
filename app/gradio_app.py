@@ -114,7 +114,7 @@ def build_ui() -> gr.Blocks:
             show_progress="hidden",
         )
 
-        clear_btn.click(fn=clear_chat, outputs=[chatbot, chatbot])
+        clear_btn.click(fn=clear_chat, outputs=[chatbot])
 
     return demo
 
