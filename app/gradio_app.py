@@ -45,7 +45,7 @@ def respond(user_message: str, history: list):
 
 
 def clear_chat():
-    return [], []
+    return [], ""
 
 
 def build_ui() -> gr.Blocks:
