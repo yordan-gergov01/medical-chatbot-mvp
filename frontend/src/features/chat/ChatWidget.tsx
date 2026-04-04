@@ -53,10 +53,20 @@ const ChatWidget = forwardRef<ChatWidgetHandle>((_props, ref) => {
 
     try {
       const res = await sendChatMessage(text, history);
-      const assistantMsg: Message = { role: "assistant", content: res.reply };
+      const assistantMsg: Message = {
+        role: "assistant",
+        content: res.reply
+          .replace(/<!--doc:dr_\d{3}-->/g, "") 
+          .trim(),
+      }
       setMessages((prev) => [...prev, assistantMsg]);
-      // Keep full OpenAI-format history for the agent
-      setHistory(res.history);
+      const cleanHistory = res.history.map((msg) => ({
+        ...msg,
+        content: typeof msg.content === "string"
+          ? msg.content.replace(/<!--doc:dr_\d{3}-->/g, "").trim()
+          : msg.content,
+      }))
+      setHistory(cleanHistory)
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -126,7 +136,15 @@ const ChatWidget = forwardRef<ChatWidgetHandle>((_props, ref) => {
                       : "bg-secondary text-secondary-foreground rounded-bl-md"
                   }`}
                 >
-                  {msg.content}
+                  {msg.content
+                    .replace(/\*\*(.*?)\*\*/g, "$1")
+                    .split("\n")
+                    .map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        {i < msg.content.split("\n").length - 1 && <br />}
+                      </span>
+                    ))}
                 </div>
               </div>
             ))}

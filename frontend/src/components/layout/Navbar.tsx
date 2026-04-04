@@ -23,7 +23,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <a href="#" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-2 text-xl font-display font-bold text-primary">
-          🏥 Zdrave Plus
+          🏥 Здраве Плюс
         </a>
 
         {/* Desktop */}
@@ -34,7 +34,7 @@ const Navbar = () => {
             </button>
           ))}
           <Button size="sm" onClick={() => scrollTo("#specialists")}>
-            Book Now
+            Запази час
           </Button>
         </div>
 
@@ -53,7 +53,7 @@ const Navbar = () => {
             </button>
           ))}
           <Button size="sm" className="mt-2 w-full" onClick={() => scrollTo("#specialists")}>
-            Book Now
+            Запази час
           </Button>
         </div>
       )}
