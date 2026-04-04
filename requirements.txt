@@ -26,3 +26,7 @@ plotly>=5.19.0
 # Utils
 python-dotenv>=1.0.0
 numpy>=1.26.0
+
+# API server
+fastapi>=0.111.0
+uvicorn>=0.29.0

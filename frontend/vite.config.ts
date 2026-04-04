@@ -13,4 +13,14 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './src/hooks'),
     },
   },
+  server: {
+    port: 5173,
+    proxy: {
+      // All /api calls forwarded to FastAPI during local development
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+    },
+  },
 })

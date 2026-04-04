@@ -23,20 +23,20 @@ ASSISTANT_AVATAR = "https://cdn-icons-png.flaticon.com/512/4712/4712109.png"
 
 
 def respond(user_message: str, history: list):
-    """Generator — директно обновява chatbot-а на всеки yield."""
     if not user_message.strip():
         yield "", history
         return
-
-    history = history + [{"role": "user", "content": user_message}]
-
-    thinking = history + [{"role": "assistant", "content": "⏳ Мисля…"}]
-    yield "", thinking
 
     openai_history = [
         {"role": msg["role"], "content": msg["content"]}
         for msg in history
     ]
+    
+    history = history + [{"role": "user", "content": user_message}]
+
+    thinking = history + [{"role": "assistant", "content": "⏳ Мисля…"}]
+    yield "", thinking
+
 
     reply, _ = agent.chat(user_message, openai_history)
 

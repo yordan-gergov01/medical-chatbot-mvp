@@ -22,7 +22,8 @@ TEXTS_MAP: dict = {}
 _SENTINEL_RE = re.compile(r"<!--doc:(?P<id>dr_\d{3})-->")
 
 _SKIP_RAG_RE = re.compile(
-    r"\b0[0-9]{9}\b"
+    r"\b(здравейте?|здрасти|добър ден|добро утро|добър вечер|довиждане|благодаря|благодарим|мерси|ok|окей|хей|hey|hello|hi)\b"
+    r"|\b0[0-9]{9}\b"
     r"|\bтелефон\b|\bтел\.?\b"
     r"|\bказвам се\b|\bимена(та)? (са|ми)\b"
     r"|\bустройва ме\b|\bпотвърж?д\w*\b|\bда, запиши\b"
@@ -194,7 +195,10 @@ class MedicalAgent:
             return json.dumps({"error": str(e)})
 
     def chat(self, user_message: str, history: list[dict]) -> tuple[str, list[dict]]:
+        print(f"[agent.chat] user_message={user_message!r}")
+        print(f"[agent.chat] history={history}")
         rag = self._rag_context(user_message)
+        print(f"[agent.chat] rag={rag!r}")
         user_content = (
             f"[Информация от базата]\n{rag}\n\n[Въпрос]\n{user_message}" if rag
             else user_message
