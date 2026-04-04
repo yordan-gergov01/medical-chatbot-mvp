@@ -20,15 +20,15 @@ const Hero = ({ onOpenChat }: HeroProps) => {
           Здраве Плюс
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-          Your health, our priority. Expert medical care in the heart of Sofia with a team of over 20 experienced specialists.
+          Вашето здраве е наш приоритет. Експертна медицинска помощ в сърцето на София с екип от над 20 опитни специалисти.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
           <Button size="lg" onClick={() => document.querySelector("#specialists")?.scrollIntoView({ behavior: "smooth" })}>
-            Book Appointment
+            Запази среща
           </Button>
           <Button size="lg" variant="outline" onClick={onOpenChat} className="gap-2">
             <MessageCircle size={18} />
-            Chat with AI Assistant
+            Попитай нашия AI асистент
           </Button>
         </div>
       </div>

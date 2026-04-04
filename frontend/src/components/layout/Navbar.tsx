@@ -21,7 +21,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
+      <div className="container mx-auto flex items-center justify-between h-16 px-2">
         <a href="#" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-2 text-xl font-display font-bold text-primary">
           🏥 Здраве Плюс
         </a>
