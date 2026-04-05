@@ -1,8 +1,9 @@
-
 import json
 import sys
 import pickle
+import uvicorn
 import random
+import os
 import numpy as np
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -181,12 +182,7 @@ with open(IDX_DIR / "texts.pkl", "wb") as f:
     pickle.dump(texts_map, f)
 
 print(f"  FAISS index: {index.ntotal} vectors")
-print("Setup complete — launching app...\n")
+print("Setup complete - launching FastAPI...\n")
 
-import importlib.util
-spec = importlib.util.spec_from_file_location("gradio_app", ROOT / "app" / "gradio_app.py")
-gradio_app_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(gradio_app_module)
-
-demo = gradio_app_module.build_ui()
-demo.launch(server_name="0.0.0.0", server_port=10000)
+port = int(os.environ.get("PORT", 8000))
+uvicorn.run("src.app:app", host="0.0.0.0", port=port)

@@ -23,6 +23,7 @@ _SENTINEL_RE = re.compile(r"<!--doc:(?P<id>dr_\d{3})-->")
 
 _SKIP_RAG_RE = re.compile(
     r"\b(здравейте?|здрасти|добър ден|добро утро|добър вечер|довиждане|благодаря|благодарим|мерси|ok|окей|хей|hey|hello|hi)\b"
+    r"|\bсъщия лекар\b|\bсъщата лекарка\b|\bпак при него\b|\bпак при нея\b"
     r"|\b0[0-9]{9}\b"
     r"|\bтелефон\b|\bтел\.?\b"
     r"|\bказвам се\b|\bимена(та)? (са|ми)\b"
@@ -110,9 +111,10 @@ def _active_doctor_from_history(history: list[dict]) -> tuple[str, dict] | tuple
         if msg.get("role") != "tool":
             continue
         try:
-            if doc_id := json.loads(_content_as_str(msg.get("content"))).get("doctor_id"):
-                if doc_id in _doctors:
-                    last_id = doc_id
+            data = json.loads(_content_as_str(msg.get("content")))
+            doc_id = data.get("doctor_id")
+            if doc_id and doc_id in _doctors:
+                last_id = doc_id
         except (json.JSONDecodeError, TypeError):
             pass
 
@@ -195,10 +197,7 @@ class MedicalAgent:
             return json.dumps({"error": str(e)})
 
     def chat(self, user_message: str, history: list[dict]) -> tuple[str, list[dict]]:
-        print(f"[agent.chat] user_message={user_message!r}")
-        print(f"[agent.chat] history={history}")
         rag = self._rag_context(user_message)
-        print(f"[agent.chat] rag={rag!r}")
         user_content = (
             f"[Информация от базата]\n{rag}\n\n[Въпрос]\n{user_message}" if rag
             else user_message
@@ -210,6 +209,7 @@ class MedicalAgent:
             {"role": "user", "content": user_content},
         ]
         turn_tools: list[dict] = []
+        turn_messages: list = []
 
         for _ in range(8):
             response = self.client.chat.completions.create(
@@ -241,13 +241,20 @@ class MedicalAgent:
                 if active_id:
                     reply += f"<!--doc:{active_id}-->"
 
+                def _serialize(m):
+                    if isinstance(m, dict):
+                        return m
+                    return m.model_dump(exclude_none=True)
+
                 updated = [
                     *history,
                     {"role": "user", "content": user_message},
+                    *[_serialize(m) for m in turn_messages],
                     {"role": "assistant", "content": reply},
                 ]
                 return reply, updated
 
+            tool_results = []
             for tc in msg.tool_calls:
                 args = json.loads(tc.function.arguments)
                 result = self._run_tool(tc.function.name, args)
@@ -255,11 +262,16 @@ class MedicalAgent:
                 tool_msg = {"role": "tool", "tool_call_id": tc.id, "content": result}
                 messages.append(tool_msg)
                 turn_tools.append(tool_msg)
+                tool_results.append(tool_msg)
+
+            turn_messages.append(msg) 
+            turn_messages.extend(tool_results)
 
         reply = "Извинявам се, не успях да обработя заявката. Обадете се на 02 800 12 34."
         return reply, [
             *history,
             {"role": "user", "content": user_message},
+            *turn_tools,
             {"role": "assistant", "content": reply},
         ]
 
