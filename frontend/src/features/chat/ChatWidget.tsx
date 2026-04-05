@@ -104,7 +104,7 @@ const ChatWidget = forwardRef<ChatWidgetHandle>((_props, ref) => {
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-primary/5">
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-display font-bold text-lg">
-              З
+              🧑‍⚕️
             </div>
             <div className="flex-1">
               <p className="font-semibold text-sm">Здраве Плюс Асистент</p>

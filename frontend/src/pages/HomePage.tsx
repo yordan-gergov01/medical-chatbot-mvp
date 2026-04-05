@@ -1,4 +1,3 @@
-import { Contact } from "lucide-react";
 import { useRef } from "react";
 
 import Footer from "@/components/layout/Footer";
@@ -24,7 +23,6 @@ const HomePage = () => {
         <Specialists />
         <Specialties />
         <FAQ />
-        <Contact />
       </main>
       <Footer />
       <ChatWidget ref={chatRef} />

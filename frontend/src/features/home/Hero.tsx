@@ -14,7 +14,7 @@ const Hero = ({ onOpenChat }: HeroProps) => {
 
       <div className="container mx-auto px-4 text-center relative z-10">
         <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium animate-fade-in-up">
-          Trusted by 10,000+ patients since 2010
+          Повече от 10 000+ пациенти ни се доверяват от 2010 г.
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-foreground mb-6 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
           Здраве Плюс
