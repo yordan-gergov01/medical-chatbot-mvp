@@ -99,7 +99,7 @@ const ChatWidget = forwardRef<ChatWidgetHandle>((_props, ref) => {
 
       {/* Chat panel */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-3rem)] bg-card rounded-2xl shadow-2xl border border-border flex flex-col animate-slide-up overflow-hidden">
+         <div className="fixed inset-0 z-50 flex flex-col bg-card sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[380px] sm:max-w-[calc(100vw-2rem)] sm:h-[520px] sm:max-h-[calc(100vh-3rem)] sm:rounded-2xl shadow-2xl border border-border animate-slide-up overflow-hidden">
 
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-primary/5">
